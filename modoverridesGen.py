@@ -143,7 +143,10 @@ class ModInfo:
         self.configs = other.configs
         for ock, ocv in old_config.items():
             if ock not in self.configs:
-                self.configs[ock] = ocv
+                # if the new configuration_options does not contain the specific option,
+                # probably we shouldn't include it in the new config neither.
+                # self.configs[ock] = ocv
+                pass
             else:
                 self.configs[ock] = ocv.merge(self.configs[ock])
                 # self.configs[ock].merge(ocv)
