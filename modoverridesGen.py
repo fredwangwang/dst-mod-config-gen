@@ -46,9 +46,11 @@ class ModInfoConfig:
 
     def to_lua_string_parts(self):
         rets = []
-        rets.append("-- %s" % (self.label or self.name))
+        if self.label or self.name:
+            rets.append("-- %s" % (self.label or self.name))
         rets.extend(self._to_lua_string_config_options())
-        rets.append("[\"%s\"] = %s," % (self.name, sanitize_data(self.default)))
+        if self.name != "":
+            rets.append("[\"%s\"] = %s," % (self.name, sanitize_data(self.default)))
         return rets
 
     def merge(self, other):
@@ -103,7 +105,7 @@ class ModInfo:
     def __str__(self):
         return "\n".join(self.to_lua_string_parts())
 
-    def _set_workshop_id(self, folder_name):
+    def set_workshop_id(self, folder_name):
         self.workshop_id = folder_name
 
     @staticmethod
@@ -114,7 +116,7 @@ class ModInfo:
             # Health Info has invalid escape sequence in the string... sanitize it so lua interpreter
             modinfo_str = re.sub('(?<!\\\\)\\\\(?![ "ntr\\\\])', '', modinfo_file.read())
         mod_info = ModInfo.parse_modinfo_string(modinfo_str)
-        mod_info._set_workshop_id(workshop_id)
+        mod_info.set_workshop_id(workshop_id)
         return mod_info
 
     @staticmethod
@@ -163,7 +165,8 @@ class ModInfo:
 
     def to_lua_string_parts(self):
         rets = []
-        rets.append("-- %s" % self.name)
+        if self.name:
+            rets.append("-- %s" % self.name)
         rets.append("[\"%s\"] = { enabled = %s," % (self.workshop_id, sanitize_data(self.enabled)))
         rets.extend(self._to_lua_string_configs())
         rets.append("},")
@@ -173,6 +176,7 @@ class ModInfo:
 class ModInfos:
     def __init__(self, modinfos=None):
         self.modinfos = modinfos or OrderedDict()
+        self.loaded_workshop_ids = []  # use this to keep the generated list in order, given the files are provided
 
     @staticmethod
     def load_from_existing_overrides_file(filepath):
@@ -192,6 +196,7 @@ class ModInfos:
         modinfos = OrderedDict()
         for modinfo in modinfos_lua and modinfos_lua.items() or []:
             modinfos[modinfo[0]] = ModInfos._load_from_configs_entry(modinfo[1])
+            modinfos[modinfo[0]].set_workshop_id(modinfo[0])
         return ModInfos(modinfos)
 
     @staticmethod
@@ -209,14 +214,26 @@ class ModInfos:
             self.modinfos[workshop_id] = info
         else:
             self.modinfos[workshop_id].merge(info)
+        self.loaded_workshop_ids.append(workshop_id)
 
     def load_from_modinfo_files(self, modinfo_files):
         list(map(self.load_from_modinfo_file, modinfo_files))
 
+    def get_modinfos_in_order(self):
+        remaining_keys = list(self.modinfos.keys())
+
+        rets = []
+        for key in self.loaded_workshop_ids:
+            rets.append(self.modinfos[key])
+            remaining_keys.remove(key)
+        for key in remaining_keys:
+            rets.append(self.modinfos[key])
+        return rets
+
     def __str__(self):
         rets = []
         rets.append("return {")
-        for x in self.modinfos.values():
+        for x in self.get_modinfos_in_order():
             rets.extend(x.to_lua_string_parts())
         rets.append("}")
         return "\n".join(rets)
@@ -238,6 +255,7 @@ if __name__ == "__main__":
         print("make sure you are only running this file inside mods folder")
         exit(1)
 
+    # infos = ModInfos()
     infos = ModInfos.load_from_existing_overrides_file(modoverrides_path)
     infos.load_from_modinfo_files(get_all_modinfo(mod_root_folder))
     with open("modoverrides.lua", "w", encoding="UTF-8") as outf:
