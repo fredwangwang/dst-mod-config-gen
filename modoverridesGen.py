@@ -1,18 +1,33 @@
 import glob
 import os
 import re
+import subprocess
 import sys
+import time
 from collections import OrderedDict
 
-from lupa import LuaRuntime
-
 if sys.version_info[0] < 3:
-    raise Exception("Must be using Python 3")
+    use_python3 = "Must be using Python 3"
+    print(use_python3)
+    time.sleep(1.5)
+    raise Exception(use_python3)
+
+try:
+    from lupa import LuaRuntime
+except ImportError:
+    print("lupa not found, trying to install it...")
+    subprocess.call([sys.executable, "-m", "pip", "install", "lupa", "--user"])
+    try:
+        from lupa import LuaRuntime
+    except ImportError as e:
+        print("failed to import lupa, file an issue if you will")
+        time.sleep(1.5)
+        raise e
 
 indent = "    "
 
 
-def sanitize_data(data):
+def format_data(data):
     if isinstance(data, str):
         value = "\"" + data + "\""
     elif isinstance(data, bool):
@@ -41,7 +56,7 @@ class ModInfoConfig:
         rets = []
         for option in self.options:
             rets.append(
-                "-- description = %s, data = %s" % (option["description"], sanitize_data(option["data"])))
+                "-- description = %s, data = %s" % (option["description"], format_data(option["data"])))
         return rets
 
     def to_lua_string_parts(self):
@@ -50,7 +65,7 @@ class ModInfoConfig:
             rets.append("-- %s" % (self.label or self.name))
         rets.extend(self._to_lua_string_config_options())
         if self.name != "":
-            rets.append("[\"%s\"] = %s," % (self.name, sanitize_data(self.default)))
+            rets.append("[\"%s\"] = %s," % (self.name, format_data(self.default)))
         return rets
 
     def merge(self, other):
@@ -167,7 +182,7 @@ class ModInfo:
         rets = []
         if self.name:
             rets.append("-- %s" % self.name)
-        rets.append("[\"%s\"] = { enabled = %s," % (self.workshop_id, sanitize_data(self.enabled)))
+        rets.append("[\"%s\"] = { enabled = %s," % (self.workshop_id, format_data(self.enabled)))
         rets.extend(self._to_lua_string_configs())
         rets.append("},")
         return map(lambda x: indent + x, rets)
