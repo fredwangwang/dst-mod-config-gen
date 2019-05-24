@@ -1,6 +1,21 @@
 # dst-mod-config-gen
 Generate modoverrides.lua for dedicated don't starve together server.
 
+
+## How to use:
+1. Make sure you have Python 3 installed
+1. Download `modoverridesGen.py` script from [here](https://raw.githubusercontent.com/fredwangwang/dst-mod-config-gen/master/modoverridesGen.py)
+1. Drop the script into `mods` folder
+1. Execute `modoverridesGen.py` by double clicking on it, or run `python modoverridesGen.py` from commandline
+1. Your `modoverrides.lua` will be ready in the same folder!
+
+## Feature:
+* Generate `modoverrides.lua` for you
+* Auto drops staled config options when the mod get updated
+* Shows avaiable configuration options with each configuration options entry
+* Preserve config changes you made in the `modoverrides.lua` when running the script again
+
+## Motivation:
 This project is inspired by [DSTConfig](https://github.com/INpureProjects/DSTConfig). DSTConfig does a good job in
 generating the `modoverrides.lua`, and I've used it quite a bit when hosting my own dedicated server. However, it only generates
 a skeleton `modoverrides.lua` with the default options chosed but not how to configure the options. Here is an example:
@@ -82,18 +97,6 @@ return {
 }
 ```
 
-## How to use:
-1. Make sure you have Python 3 installed
-1. Download `modoverridesGen.py` script from [here](https://raw.githubusercontent.com/fredwangwang/dst-mod-config-gen/master/modoverridesGen.py)
-1. Drop the script into `mods` folder
-1. Execute `modoverridesGen.py` by double clicking on it, or run `python modoverridesGen.py` from commandline
-1. Your `modoverrides.lua` will be ready in the same folder!
-
-## Features:
-* Generate `modoverrides.lua` for you
-* Auto drops staled config options when the mod get updated
-* Shows avaiable configuration options with each configuration options entry
-* Preserve config changes you made in the `modoverrides.lua` when running the script again
 
 
 
