@@ -18,7 +18,7 @@ except ImportError:
     print("lupa not found, trying to install it...")
     subprocess.call([sys.executable, "-m", "pip", "install", "lupa", "--user"])
     try:
-        from lupa import LuaRuntime1
+        from lupa import LuaRuntime
     except ImportError as e:
         print("failed to import lupa, file an issue if you will")
         time.sleep(1.5)
