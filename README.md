@@ -84,12 +84,10 @@ return {
 
 ## How to use:
 1. Make sure you have Python 3 installed
-1. Install denendency for the script by executing `pip install lupa --user` from commandline
 1. Download `modoverridesGen.py` script from [here](https://raw.githubusercontent.com/fredwangwang/dst-mod-config-gen/master/modoverridesGen.py)
 1. Drop the script into `mods` folder
 1. Execute `modoverridesGen.py` by double clicking on it, or run `python modoverridesGen.py` from commandline
 1. Your `modoverrides.lua` will be ready in the same folder!
-
 
 ## Features:
 * Generate `modoverrides.lua` for you
