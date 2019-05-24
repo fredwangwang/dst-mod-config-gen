@@ -41,6 +41,12 @@ def format_data(data):
 
 
 class ModInfoConfig:
+    def __eq__(self, other):
+        return self.options == other.options and \
+               self.name == other.name and \
+               self.label == other.label and \
+               self.default == other.default
+
     def __init__(self, name=None, label=None, default=None, options=None):
         if options is None:
             options = []
@@ -71,7 +77,7 @@ class ModInfoConfig:
     def merge(self, other):
         self.name = self.name or other.name
         self.label = self.label or other.label
-        self.default = self.default or other.default
+        self.default = self.default if self.default is not None else other.default
         self.options = other.options or self.options
         return self
 
