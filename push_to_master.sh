@@ -3,6 +3,7 @@
 cp modoverridesGen.py /tmp/modoverridesGen.py
 
 git checkout master
+git pull -r
 
 cp /tmp/modoverridesGen.py modoverridesGen.py
 
